@@ -1,20 +1,25 @@
-// importing the modules for app
 const request = require('request');
 
-// parse user input for breed search
-const breed = process.argv[2];
+const fetchBreedDescription = (breedName, callback) => {
 
-// pass user input to search api url
-const url = `https://api.thecatapi.com/v1/breeds/search?q=${breed}`;
+  if (typeof breedName !== `string`) {
+    return callback(null, `provide a valid breed name`);
+  }
+	
+  const url = `https://api.thecatapi.com/v1/breeds/search?q=${breedName}`;
 
-request(url, (e, r, body) => {
-  if (e) {
-    return console.log(e);
-  }
-  const data = JSON.parse(body);
-  if (Object.keys(data).length === 0) {
-    return console.log('no matching breed found');
-  }
-  console.log(data[0].description);
-  console.log(typeof data);
-});
+  request(url, (e, r, body) => {
+    if (e) {
+      return callback(e, null);
+    }
+    const data = JSON.parse(body);
+    if (Object.keys(data).length === 0) {
+      return callback(`no matching breed found`, null);
+    }
+    callback(null, data[0].description);
+  });
+};
+
+module.exports = {
+  fetchBreedDescription
+};
